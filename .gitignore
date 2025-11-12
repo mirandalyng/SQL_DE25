@@ -1,2 +1,6 @@
+#duckDB
 *.wal
 *.duckdb 
+
+#mac 
+*.DS_Store
