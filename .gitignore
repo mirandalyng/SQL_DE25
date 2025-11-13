@@ -4,3 +4,9 @@
 
 #mac 
 *.DS_Store
+
+#vs code 
+.vscode
+
+#testing file 
+test 
