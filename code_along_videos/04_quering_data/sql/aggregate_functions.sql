@@ -1,0 +1,8 @@
+--FROM ALL OF THE ROWS 
+SELECT
+    MIN(salary_in_usd) AS min_salary_usd,
+    ROUND(AVG(salary_in_usd)) AS avg_salary_usd,
+    ROUND(MEDIAN (salary_in_usd)) AS median_salary_usd,
+    MAX(salary_in_usd) AS max_salary_usd
+FROM
+    data_jobs
