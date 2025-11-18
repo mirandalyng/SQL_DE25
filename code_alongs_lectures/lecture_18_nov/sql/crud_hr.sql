@@ -23,7 +23,7 @@ CREATE TABLE
 
 /*
 Task 2
-CRUD - create  
+CRUD - CREATE  
 -----------
  */
 -- insert 3 rows manually 
@@ -54,11 +54,12 @@ FROM
 --LIMIT 10; - show the first 10
 --OFFSET 10 ; - don't show the frist 10 
 -----------------------------------------
-/* =============
+--Task 3
+/*  =============
 CRUD - UPDATE
 modifying existing data 
-==============*/
---task 3
+==============
+ */
 --update the id 98 and 99 to 2023 
 UPDATE staging.employees
 SET
@@ -68,3 +69,38 @@ WHERE
 
 -- WHERE employee_id = 98 OR employee_id = 99
 -- clean and companct code use IN
+---------------------------------------------
+--Task 4 
+/* ===============
+DDL - ALTER 
+============== */
+-- add information about the pension plan
+--Add column to table 
+ALTER TABLE staging.employees
+ADD COLUMN pension_plan VARCHAR DEFAULT 'plan 1'
+/* ===============
+CRUD - UPDATE 
+============== */
+UPDATE staging.employees
+SET
+    pension_plan = 'plan 2'
+WHERE
+    employment_year > 2015;
+
+-------------------------------
+/* ===============
+CRUD - DELETE 
+============== */
+--Task 5 
+--Always check the rows you plan to delete first
+SELECT
+    *
+FROM
+    staging.employees
+WHERE
+    employee_id = 1;
+
+--remove id = 1
+DELETE FROM staging.employees
+WHERE
+    employee_id = 1;
