@@ -35,7 +35,7 @@ CREATE TABLE
 
 --create glossary tables 
 CREATE TABLE
-    IF NOT EXISTS database.python (
+    IF NOT EXISTS programming.python (
         id INTEGER PRIMARY KEY DEFAULT nextval ('id_python_sequence'),
         word STRING,
         description STRING
