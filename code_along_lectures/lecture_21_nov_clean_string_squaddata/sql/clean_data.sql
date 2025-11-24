@@ -90,3 +90,4 @@ SELECT
   
   answers
 FROM staging.squad; 
+
