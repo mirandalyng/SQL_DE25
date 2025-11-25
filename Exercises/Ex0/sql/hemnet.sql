@@ -1,11 +1,10 @@
-
-
-CREATE TABLE IF NOT EXISTS hemnet_data AS (
-    SELECT
-        *
-    FROM
-        read_csv_auto ('data/hemnet_data_clean.csv')
-);
+CREATE TABLE
+    IF NOT EXISTS hemnet_data AS (
+        SELECT
+            *
+        FROM
+            read_csv_auto ('data/hemnet_data_clean.csv')
+    );
 
 --wildcard % 
 SELECT
@@ -35,13 +34,12 @@ ORDER BY
 LIMIT
     5;
 
-
 -- g) Find out statistics on minimum, mean, median and maximum prices of homes sold.
 SELECT
     MAX(final_price) AS max_price,
     MIN(final_price) AS min_price,
     AVG(final_price) AS avg_price,
-    MEDIAN(final_price) AS median_price
+    MEDIAN (final_price) AS median_price
 FROM
     hemnet_data;
 
@@ -50,8 +48,7 @@ SELECT
     COUNT(DISTINCT commune) AS unique_communes
 FROM
     hemnet_data
-
---j) How many percentage of homes cost more than 10 million?
+    --j) How many percentage of homes cost more than 10 million?
 SELECT
     100.0 * COUNT(*) / (
         SELECT
