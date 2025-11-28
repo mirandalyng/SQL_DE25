@@ -1,5 +1,6 @@
 ----------------------------------------
 ---TASK 1
+----------------------------------------
 CREATE SCHEMA IF NOT EXISTS staging;
 
 CREATE TABLE
@@ -20,36 +21,169 @@ CREATE TABLE
 
 ----------------------------------------
 ---TASK 2
+----------------------------------------
 --\ backslah before the dot is to tell that there is 1 dot 
 --Using UNION ALL to combine the two tables 
 SELECT
     *
-from
+FROM
     staging.crm_new
-where
-    not regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
-    OR region not in ('EU', 'US')
-    OR status not in ('active', 'inactive')
+WHERE
+    NOT regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+    OR NOT region IN ('EU', 'US')
+    OR NOT status IN ('active', 'inactive')
 UNION ALL
 SELECT
     *
-from
+FROM
     staging.crm_old
-where
-    not regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
-    OR region not in ('EU', 'US')
-    OR status not in ('active', 'inactive');
+WHERE
+    NOT regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+    OR NOT region IN ('EU', 'US')
+    OR NOT status IN ('active', 'inactive');
 
 ----------------------------------------
 ---TASK 3 
+----------------------------------------
 CREATE SCHEMA IF NOT EXISTS constrained;
 
 CREATE TABLE
-    IF NOT EXISTS contrained.cmr_new_cleaned;
+    IF NOT EXISTS constrained.crm_old (
+        customer_id INTEGER UNIQUE,
+        name VARCHAR NOT NULL,
+        email VARCHAR NOT NULL CHECK (email LIKE '%@%.%'),
+        region VARCHAR CHECK (region IN ('EU', 'US')),
+        status VARCHAR CHECK (status IN ('active', 'inactive'))
+    );
 
 CREATE TABLE
-    IF NOT EXISTS contrained.cmr_old_cleaned;
+    IF NOT EXISTS constrained.crm_new (
+        customer_id INTEGER UNIQUE,
+        name VARCHAR NOT NULL,
+        email VARCHAR CHECK (
+            regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+        ),
+        region VARCHAR CHECK (region IN ('EU', 'US')),
+        status VARCHAR CHECK (status IN ('active', 'inactive'))
+    );
 
+---------------------------------------------------------------------------------------
+--INSERT INTO ---
+---------------------------------------------------------------------------------------
+--insert into the new file by using the data that exists from the csv - file 
+INSERT INTO
+    constrained.crm_old
+SELECT
+    *
+FROM
+    staging.crm_old
+WHERE
+    regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+    AND region IN ('EU', 'US')
+    AND status IN ('active', 'inactive');
+
+INSERT INTO
+    constrained.crm_new
+SELECT
+    *
+FROM
+    staging.crm_new
+WHERE
+    regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+    AND region IN ('EU', 'US')
+    AND status IN ('active', 'inactive');
+
+----------------------------------------
+---TASK 4
+----------------------------------------
+--how many customers are only in the old crm system?
+--7 Customers are only in the old system 
+SELECT
+    customer_id
+FROM
+    staging.crm_old
+EXCEPT
+SELECT
+    customer_id
+FROM
+    staging.crm_new;
+
+--customers only recorded in the new CRM system
+--6 customers are only in the new system 
+SELECT
+    customer_id
+FROM
+    staging.crm_new
+EXCEPT
+SELECT
+    customer_id
+FROM
+    staging.crm_old;
+
+--customers recorded in both CRM system
+-- 7 common customers 
+SELECT
+    customer_id
+FROM
+    staging.crm_new
+INTERSECT
+SELECT
+    customer_id
+FROM
+    staging.crm_old;
+
+----------------------------------------
+---TASK 5
+----------------------------------------
+--subquery 1: customer only in the old crm system 
+(
+    SELECT
+        *
+    FROM
+        staging.crm_old
+    EXCEPT
+    SELECT
+        *
+    FROM
+        staging.crm_new
+)
+UNION
+-- subquery 2: customer only in the new crm system
+(
+    SELECT
+        *
+    FROM
+        staging.crm_new
+    EXCEPT
+    SELECT
+        *
+    FROM
+        staging.crm_old
+)
+UNION
+--subquery 3: customers violating constraints in old crm system 
+(
+    SELECT
+        *
+    FROM
+        staging.crm_old
+    WHERE
+        NOT regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+        OR NOT region IN ('EU', 'US')
+        OR NOT status IN ('active', 'inactive')
+)
+UNION
+--subquery 4: customers violating constraints in new crm system
+(
+    SELECT
+        *
+    FROM
+        staging.crm_new
+    WHERE
+        NOT regexp_matches (email, '[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]')
+        OR NOT region IN ('EU', 'US')
+        OR NOT status IN ('active', 'inactive')
+)
 ----------------------------------------
 --Task 2 - DEBBIES SOLUTION 
 ------------------------------
@@ -73,3 +207,7 @@ FROM
     staging.crm_new
 WHERE
     regexp_matches (email, '[A-Za-z0-9\_]+@[A-Za-z0-9\_]+\.[A-Za-z]');
+
+----------------------------------------
+--combine all three conditions
+--same as I did
