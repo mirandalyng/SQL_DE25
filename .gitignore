@@ -11,7 +11,4 @@
 #testing file 
 test 
 
-*.duckdb
 *.db
-*.sqlite
-data/
